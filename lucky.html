@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="jq.js"></script>
+	<style>
+		#lucky{
+			width:600px;
+			height:600px;
+			background: pink;
+		}
+		a{
+			text-decoration: none;
+
+		}
+		#lucky table{
+			width:100%;
+			height:100%;
+		}
+		#lucky table td{
+			width:33.3333%;
+			height:33.3333%;
+			text-align: center;
+			background: green;
+			font-size: 50px;
+			color:#ddd;
+		}
+		#lucky table td.active{
+			background: red;
+			color:#fff;
+		}
+	</style>
+</head>
+<body>
+	<div id="lucky">
+		<table>
+		<tr>
+			<td data-num="1">1</td>
+			<td data-num="2">2</td>
+			<td data-num="3">3</td>
+		</tr>
+		<tr>
+			<td data-num="8">8</td>
+			<td><a id="start" href="javascript:;">开始</a></td>
+			<td data-num="4">4</td>
+		</tr>
+		<tr>
+			<td data-num="7">7</td>
+			<td data-num="6">6</td>
+			<td data-num="5">5</td>
+		</tr>
+	</table>
+	</div>
+</body>
+<script>
+	window.onload = function(){
+
+		// 奖项
+		lucky_prizes = {
+			1 : "奖品1",
+			2 : "奖品2",
+			3 : "奖品3",
+			4 : "奖品4",
+			5 : "奖品5",
+			6 : "奖品6",
+			7 : "奖品7",
+			8 : "奖品8",
+		}
+
+		var lucky_index = null;
+
+		function playLucky(callback){
+
+			var lucky = {
+
+				endNum : 8,//Math.floor(Math.random()*($("#lucky td").length - 2)+1),  //抽奖结果
+				quan   : 9, //转动多少圈停止
+				timer  : null, //控制器
+				speed  : 30, //转动的速度
+
+			}
+
+			lucky_index = lucky.endNum;
+
+			var len = $("#lucky td").length - 1;
+			var currentNum = 1;
+			var currentQuan = 0;
+			function sport(){
+				if( lucky.endNum > len ){
+
+					alert("参数不正确");
+					callback();
+					return;
+
+				}
+				// 实现动画效果
+				$("#lucky td").removeClass("active");
+				$("td[data-num="+currentNum+"]").addClass("active");
+				if(currentNum > len){
+					currentNum = 1;
+					currentQuan += 1;
+				}else{
+					// 最终抽奖结果
+					if( currentQuan >= lucky.quan && currentNum == lucky.endNum){
+						$("td[data-num="+lucky.endNum+"]").addClass("active");
+						clearInterval(lucky.timer);
+						// 抽奖结束的回调函数
+						callback();
+						return;
+					}
+					currentNum++; 
+				}
+				// 速度的判断
+				if( currentQuan > (lucky.quan-4)){
+
+					lucky.speed = 40
+
+				}
+				if( currentQuan > (lucky.quan-3)){
+
+					lucky.speed = 70
+
+				}
+				if( currentQuan > (lucky.quan-2)){
+
+					lucky.speed = 100
+
+				}
+				if( currentQuan > (lucky.quan-1)){
+					lucky.speed = 120
+
+				}
+				if( (currentQuan > (lucky.quan-1)) && Math.abs( currentNum - lucky.endNum ) <= 5){
+					lucky.speed = 200
+
+				}
+				if( (currentQuan > (lucky.quan-1)) && Math.abs( currentNum - lucky.endNum ) <= 2){
+					lucky.speed = 300
+
+				}
+				// 实现控制器调用
+				lucky.timer = setTimeout(sport,lucky.speed)
+			}
+			sport()
+		}
+
+		var click = 1;
+		// 开始抽奖
+		$("#start").click(function(){
+			if(click){
+				click = 0;
+				playLucky(function(){
+
+					click = 1;
+					alert('恭喜您获得'+lucky_prizes[lucky_index])
+
+				});
+
+			}
+
+		})
+
+	}
+</script>
+</html>
